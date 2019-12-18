@@ -13,15 +13,13 @@ import jxl.read.biff.BiffException;
  */
 public class LeerExcel 
 {
-    private static final String EXCEL_FILE_LOCATION = "Ejemplo.xlsx";
     /**
      * Metodo para cargar los discos
      * @throws Exception
      */
     public static void leer(File file) throws IOException, BiffException
     {
-        // Itera el folder de discos
-//        File file = new File("Cadena.xls");
+
         {            
             // Obtiene la hoja de excel
             Workbook wb = Workbook.getWorkbook(file);
@@ -29,7 +27,7 @@ public class LeerExcel
             // Obtiene la primera hoja
             Sheet sheet = wb.getSheet(0);
             
-            // Itera las filas y columnas
+            // Itera las filas para leer los productos
             for (int i = 0; i < sheet.getRows(); i++) 
             {
                 // Obtiene las propiedades

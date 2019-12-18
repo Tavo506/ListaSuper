@@ -27,9 +27,9 @@ public class Principal extends javax.swing.JFrame {
     
     
     
-    private ArrayList<JLabel> ListaLabels = new ArrayList<>();
-    private ArrayList<JTextField> ListaTextFields = new ArrayList<>();
-    public static ArrayList<String> ListaProductos = new ArrayList<>();
+    private ArrayList<JLabel> ListaLabels = new ArrayList<>();  //Lista para los labels de los productos
+    private ArrayList<JTextField> ListaTextFields = new ArrayList<>();  //Lista para las entradas
+    public static ArrayList<String> ListaProductos = new ArrayList<>(); //Lista con los strings de los productos
     /**
      * Creates new form Principal
      */
@@ -132,48 +132,55 @@ public class Principal extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    //Abre la ventana de Acerca de
     private void MenuAcercaDeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuAcercaDeActionPerformed
         new AcercaDe().setVisible(true);
     }//GEN-LAST:event_MenuAcercaDeActionPerformed
 
+    //Abre la ventana de ayuda
     private void MenuAyudaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuAyudaActionPerformed
         new Instrucciones().setVisible(true);
     }//GEN-LAST:event_MenuAyudaActionPerformed
 
+    //Llama la funcion para cargar excel
     private void MenuCargarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuCargarActionPerformed
         cargarExcel();
         
     }//GEN-LAST:event_MenuCargarActionPerformed
-
+    
+    //Seleccionar el archivo excel para el pedido
     public void cargarExcel(){
-        JFileChooser Buscador = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+        JFileChooser Buscador = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());    //Abre el buscador de archivos
         
         Buscador.setAcceptAllFileFilterUsed(false);
         
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("Excel .xls", "xls");
-        Buscador.addChoosableFileFilter(filter);
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Excel .xls", "xls");  //Solo acepta el tipo de archivo .xls
+        Buscador.addChoosableFileFilter(filter);    //Agrega el filtro al buscador
         
-        File selectedFile = null;
+        File selectedFile = null;   //Inicializa el archivo en null
         
         int returnValue = Buscador.showOpenDialog(null);
-        if (returnValue == Buscador.APPROVE_OPTION) {
-            selectedFile = Buscador.getSelectedFile();
+        if (returnValue == Buscador.APPROVE_OPTION) {   //Si se selecciona un archivo valido...
+            selectedFile = Buscador.getSelectedFile();  //este se guarda
         }
         
+        //Limpia las listas de productos ************************
         ListaProductos.clear();
         ListaLabels.clear();
         ListaProductos.clear();
+        //*******************************************************
         
-        Panel.removeAll();
-        Panel.repaint();
+        Panel.removeAll();  //Limpia la interfaz
+        Panel.repaint();    //Refresca la interfaz
+        
         try {
-            if(selectedFile != null){
-                LeerExcel.leer(selectedFile);
-                BotonCargar.setVisible(false);
-                LabelInstruccion.setVisible(false);
-            }else{
-                BotonCargar.setVisible(true);
-                LabelInstruccion.setVisible(true);
+            if(selectedFile != null){   //Si el File no es null...
+                LeerExcel.leer(selectedFile);   //Se lee el excel y se carga a la interfaz
+                BotonCargar.setVisible(false);  //Desaparese el boton de cargar archivo cuando no hay nada
+                LabelInstruccion.setVisible(false); //Desaparece el texto de instruccion para cargar archivos
+            }else{  //Si no se selecciono nada...
+                BotonCargar.setVisible(true);   //Muestra el boton de inicio
+                LabelInstruccion.setVisible(true);  //Muestra el texto instruccion
             }
             
         } catch (IOException ex) {
@@ -182,8 +189,8 @@ public class Principal extends javax.swing.JFrame {
             Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        
-        for(int i = 0, x = 10; i < ListaProductos.size(); i++, x += 20){
+        //Carga los pruductos en la interfaz
+        for(int i = 0; i < ListaProductos.size(); i++){
             ListaLabels.add(new JLabel(ListaProductos.get(i)));
             ListaLabels.get(i).setForeground(Color.black);
             ListaLabels.get(i).setSize(150, 150);
@@ -198,29 +205,32 @@ public class Principal extends javax.swing.JFrame {
         Panel.updateUI();
     }
     
+    //Genera el txt con el pedido
     private void BotonGenerarPedidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonGenerarPedidoActionPerformed
-        String pedido = "";
+        String pedido = ""; //Se declara un string que sera la lista que se pondra en el txt
         
-        for(int i = 0; i < ListaTextFields.size(); i++){
-            String producto = ListaTextFields.get(i).getText();
-            if(!producto.isEmpty()){
-                if(isNumeric(producto))
-                    pedido += ListaProductos.get(i) + ": " + producto + "\n";
+        for(int i = 0; i < ListaTextFields.size(); i++){    //Recorre la lista de productos para ver cuales se van a pedir
+            String producto = ListaTextFields.get(i).getText(); 
+            if(!producto.isEmpty()){ //Verifica que la casilla del producto no este vacia
+                if(isNumeric(producto) && Integer.parseInt(producto) != 0)  //Verifica que sea un digito y que no sea un 0
+                    pedido += ListaProductos.get(i) + ": " + producto + "\n";   //Agrega el producto a pedido
                 else{
-                    ListaTextFields.get(i).requestFocusInWindow();
+                    ListaTextFields.get(i).requestFocusInWindow();  //Si no es numerico se detiene la ejecucion y se le indica al usuario que puso un dato mal
                     return;
                 }
                     
             }
         }
         
-        GenerarPedido.crear(pedido);
+        GenerarPedido.crear(pedido);    //Se crea el txt
     }//GEN-LAST:event_BotonGenerarPedidoActionPerformed
 
+    //Llama la funcion para cargar excel
     private void BotonCargarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonCargarActionPerformed
         cargarExcel();
     }//GEN-LAST:event_BotonCargarActionPerformed
 
+    //Funcion para verificar que una cadena es numerica
     public static boolean isNumeric(String str) { 
         try {  
             Double.parseDouble(str);  
