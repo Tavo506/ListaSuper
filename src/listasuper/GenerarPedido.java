@@ -6,9 +6,13 @@ import java.io.FileWriter;
 
 public class GenerarPedido {
 
-    public static void crear(String pedido){
+    public static void crear(String pedido, String nombre){
         try {
-            String ruta = "Pedido.txt";
+            String ruta;
+            if(nombre.isEmpty())
+                ruta = "Pedido.txt";
+            else
+                ruta = nombre + ".txt";
             String contenido = pedido;
 
             File file = new File(ruta);

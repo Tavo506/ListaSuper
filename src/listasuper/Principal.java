@@ -55,6 +55,8 @@ public class Principal extends javax.swing.JFrame {
         ScrollPane = new javax.swing.JScrollPane();
         Panel = new javax.swing.JPanel();
         BotonGenerarPedido = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        NombrePedido = new javax.swing.JTextField();
         BarraMenu = new javax.swing.JMenuBar();
         MenuOpciones = new javax.swing.JMenu();
         MenuCargar = new javax.swing.JMenuItem();
@@ -84,7 +86,7 @@ public class Principal extends javax.swing.JFrame {
         Panel.setLayout(new java.awt.GridLayout(0, 2, 0, 2));
         ScrollPane.setViewportView(Panel);
 
-        getContentPane().add(ScrollPane, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 439, 510));
+        getContentPane().add(ScrollPane, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 30, 439, 480));
 
         BotonGenerarPedido.setBackground(new java.awt.Color(0, 102, 255));
         BotonGenerarPedido.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
@@ -96,6 +98,16 @@ public class Principal extends javax.swing.JFrame {
             }
         });
         getContentPane().add(BotonGenerarPedido, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 516, 439, -1));
+
+        jLabel1.setText("Nombre del Pedido Generado :");
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 190, 30));
+
+        NombrePedido.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                NombrePedidoActionPerformed(evt);
+            }
+        });
+        getContentPane().add(NombrePedido, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 0, 230, 30));
 
         MenuOpciones.setText("Opciones");
 
@@ -213,7 +225,7 @@ public class Principal extends javax.swing.JFrame {
             String producto = ListaTextFields.get(i).getText(); 
             if(!producto.isEmpty()){ //Verifica que la casilla del producto no este vacia
                 if(isNumeric(producto) && Integer.parseInt(producto) != 0)  //Verifica que sea un digito y que no sea un 0
-                    pedido += ListaProductos.get(i) + ": " + producto + "\n";   //Agrega el producto a pedido
+                    pedido += producto + " : "  + ListaProductos.get(i) + "\n";   //Agrega el producto a pedido
                 else{
                     ListaTextFields.get(i).requestFocusInWindow();  //Si no es numerico se detiene la ejecucion y se le indica al usuario que puso un dato mal
                     return;
@@ -222,13 +234,17 @@ public class Principal extends javax.swing.JFrame {
             }
         }
         
-        GenerarPedido.crear(pedido);    //Se crea el txt
+        GenerarPedido.crear(pedido, NombrePedido.getText());    //Se crea el txt
     }//GEN-LAST:event_BotonGenerarPedidoActionPerformed
 
     //Llama la funcion para cargar excel
     private void BotonCargarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonCargarActionPerformed
         cargarExcel();
     }//GEN-LAST:event_BotonCargarActionPerformed
+
+    private void NombrePedidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NombrePedidoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_NombrePedidoActionPerformed
 
     //Funcion para verificar que una cadena es numerica
     public static boolean isNumeric(String str) { 
@@ -283,7 +299,9 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JMenuItem MenuAyuda;
     private javax.swing.JMenuItem MenuCargar;
     private javax.swing.JMenu MenuOpciones;
+    private javax.swing.JTextField NombrePedido;
     private javax.swing.JPanel Panel;
     private javax.swing.JScrollPane ScrollPane;
+    private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
 }
