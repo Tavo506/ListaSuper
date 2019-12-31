@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
@@ -26,7 +27,7 @@ import jxl.read.biff.BiffException;
 public class Principal extends javax.swing.JFrame {
     
     
-    
+    private boolean excelCargado = false;
     private ArrayList<JLabel> ListaLabels = new ArrayList<>();  //Lista para los labels de los productos
     private ArrayList<JTextField> ListaTextFields = new ArrayList<>();  //Lista para las entradas
     public static ArrayList<String> ListaProductos = new ArrayList<>(); //Lista con los strings de los productos
@@ -60,6 +61,7 @@ public class Principal extends javax.swing.JFrame {
         BarraMenu = new javax.swing.JMenuBar();
         MenuOpciones = new javax.swing.JMenu();
         MenuCargar = new javax.swing.JMenuItem();
+        jMenuItem1 = new javax.swing.JMenuItem();
         MenuAyuda = new javax.swing.JMenuItem();
         MenuAcercaDe = new javax.swing.JMenuItem();
 
@@ -120,6 +122,14 @@ public class Principal extends javax.swing.JFrame {
         });
         MenuOpciones.add(MenuCargar);
 
+        jMenuItem1.setText("Limpiar Pedido");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        MenuOpciones.add(jMenuItem1);
+
         MenuAyuda.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.CTRL_MASK));
         MenuAyuda.setText("Ayuda");
         MenuAyuda.addActionListener(new java.awt.event.ActionListener() {
@@ -166,7 +176,7 @@ public class Principal extends javax.swing.JFrame {
         
         Buscador.setAcceptAllFileFilterUsed(false);
         
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("Excel .xls", "xls");  //Solo acepta el tipo de archivo .xls
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Libro Excel", "xls");  //Solo acepta el tipo de archivo .xls
         Buscador.addChoosableFileFilter(filter);    //Agrega el filtro al buscador
         
         File selectedFile = null;   //Inicializa el archivo en null
@@ -190,9 +200,11 @@ public class Principal extends javax.swing.JFrame {
                 LeerExcel.leer(selectedFile);   //Se lee el excel y se carga a la interfaz
                 BotonCargar.setVisible(false);  //Desaparese el boton de cargar archivo cuando no hay nada
                 LabelInstruccion.setVisible(false); //Desaparece el texto de instruccion para cargar archivos
+                excelCargado = true;
             }else{  //Si no se selecciono nada...
                 BotonCargar.setVisible(true);   //Muestra el boton de inicio
                 LabelInstruccion.setVisible(true);  //Muestra el texto instruccion
+                excelCargado = false;
             }
             
         } catch (IOException ex) {
@@ -214,27 +226,58 @@ public class Principal extends javax.swing.JFrame {
             Panel.add(ListaLabels.get(i));
             Panel.add(ListaTextFields.get(i));
         }
+        int rellenar = ListaLabels.size()-14;
+        if(rellenar <= 0){
+            for(int i = Math.abs(rellenar); i >= 0; i--){
+                Panel.add(new JLabel());
+                Panel.add(new JLabel());
+            }
+        }
         Panel.updateUI();
     }
     
     //Genera el txt con el pedido
     private void BotonGenerarPedidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonGenerarPedidoActionPerformed
-        String pedido = ""; //Se declara un string que sera la lista que se pondra en el txt
+        if(excelCargado){
         
-        for(int i = 0; i < ListaTextFields.size(); i++){    //Recorre la lista de productos para ver cuales se van a pedir
-            String producto = ListaTextFields.get(i).getText(); 
-            if(!producto.isEmpty()){ //Verifica que la casilla del producto no este vacia
-                if(isNumeric(producto) && Integer.parseInt(producto) != 0)  //Verifica que sea un digito y que no sea un 0
-                    pedido += producto + " : "  + ListaProductos.get(i) + "\n";   //Agrega el producto a pedido
-                else{
-                    ListaTextFields.get(i).requestFocusInWindow();  //Si no es numerico se detiene la ejecucion y se le indica al usuario que puso un dato mal
-                    return;
+            String pedido = ""; //Se declara un string que sera la lista que se pondra en el txt
+
+            for(int i = 0; i < ListaTextFields.size(); i++){    //Recorre la lista de productos para ver cuales se van a pedir
+                String producto = ListaTextFields.get(i).getText(); 
+                if(!producto.isEmpty()){ //Verifica que la casilla del producto no este vacia
+                    if(isNumeric(producto) && Integer.parseInt(producto) != 0)  //Verifica que sea un digito y que no sea un 0
+                        pedido += producto + " : "  + ListaProductos.get(i) + "\n";   //Agrega el producto a pedido
+                    else{
+                        ListaTextFields.get(i).requestFocusInWindow();  //Si no es numerico se detiene la ejecucion y se le indica al usuario que puso un dato mal
+                        return;
+                    }
+
                 }
-                    
             }
-        }
+            
+            if(pedido.isEmpty()){
+                JOptionPane.showMessageDialog(this,
+                "No ha elegido ningun producto, \nno hay un pedido que crear",
+                "Advertencia",
+                JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            
+            String nombre = NombrePedido.getText(); //variable que contiene el nombre para el txt
+            if(nombre.replace(" ","").isEmpty())    //Si el nombre esta en blanco o son solo espacios...
+                nombre = "Pedido";                  //...pone el nombre "Pedido" por defecto
+            GenerarPedido.crear(pedido, nombre);    //Se crea el txt
+            
+            //Si el pedido se genero bien se le indica al usuario
+            JOptionPane.showMessageDialog(this, 
+            "Pedido generado exitosamente en la ruta del programa \n con el nombre \"" + nombre + "\"");
         
-        GenerarPedido.crear(pedido, NombrePedido.getText());    //Se crea el txt
+        }else{  //Si no hay un excel para crear un pedido se le indica al usuario
+            JOptionPane.showMessageDialog(this,
+            "No hay ningun excel cargado para generar un pedido",
+            "Advertencia",
+            JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_BotonGenerarPedidoActionPerformed
 
     //Llama la funcion para cargar excel
@@ -245,6 +288,14 @@ public class Principal extends javax.swing.JFrame {
     private void NombrePedidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NombrePedidoActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_NombrePedidoActionPerformed
+
+    //Limpia el pedido para hacerlo desde 0
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        for(int i = 0; i < ListaTextFields.size(); i++){
+            ListaTextFields.get(i).setText("");
+        }
+        Panel.repaint();    //Refresca la interfaz
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     //Funcion para verificar que una cadena es numerica
     public static boolean isNumeric(String str) { 
@@ -303,5 +354,6 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JPanel Panel;
     private javax.swing.JScrollPane ScrollPane;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JMenuItem jMenuItem1;
     // End of variables declaration//GEN-END:variables
 }

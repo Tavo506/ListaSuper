@@ -8,11 +8,7 @@ public class GenerarPedido {
 
     public static void crear(String pedido, String nombre){
         try {
-            String ruta;
-            if(nombre.isEmpty())
-                ruta = "Pedido.txt";
-            else
-                ruta = nombre + ".txt";
+            String ruta = nombre + ".txt";
             String contenido = pedido;
 
             File file = new File(ruta);
