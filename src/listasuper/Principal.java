@@ -6,7 +6,9 @@
 package listasuper;
 
 import java.awt.Color;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import static java.util.Locale.filter;
@@ -61,7 +63,8 @@ public class Principal extends javax.swing.JFrame {
         BarraMenu = new javax.swing.JMenuBar();
         MenuOpciones = new javax.swing.JMenu();
         MenuCargar = new javax.swing.JMenuItem();
-        jMenuItem1 = new javax.swing.JMenuItem();
+        LimpiarPedido = new javax.swing.JMenuItem();
+        CargarPedido = new javax.swing.JMenuItem();
         MenuAyuda = new javax.swing.JMenuItem();
         MenuAcercaDe = new javax.swing.JMenuItem();
 
@@ -122,13 +125,21 @@ public class Principal extends javax.swing.JFrame {
         });
         MenuOpciones.add(MenuCargar);
 
-        jMenuItem1.setText("Limpiar Pedido");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+        LimpiarPedido.setText("Limpiar Pedido");
+        LimpiarPedido.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
+                LimpiarPedidoActionPerformed(evt);
             }
         });
-        MenuOpciones.add(jMenuItem1);
+        MenuOpciones.add(LimpiarPedido);
+
+        CargarPedido.setText("Cargar Pedido");
+        CargarPedido.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CargarPedidoActionPerformed(evt);
+            }
+        });
+        MenuOpciones.add(CargarPedido);
 
         MenuAyuda.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.CTRL_MASK));
         MenuAyuda.setText("Ayuda");
@@ -268,9 +279,16 @@ public class Principal extends javax.swing.JFrame {
                 nombre = "Pedido";                  //...pone el nombre "Pedido" por defecto
             GenerarPedido.crear(pedido, nombre);    //Se crea el txt
             
+            String ruta = "la ruta del programa";
+            try {
+                ruta = new File(".").getCanonicalPath();
+            } catch (IOException ex) {
+                Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
             //Si el pedido se genero bien se le indica al usuario
             JOptionPane.showMessageDialog(this, 
-            "Pedido generado exitosamente en la ruta del programa \n con el nombre \"" + nombre + "\"");
+            "Pedido generado exitosamente en " + ruta +"\n con el nombre \"" + nombre + "\"");
         
         }else{  //Si no hay un excel para crear un pedido se le indica al usuario
             JOptionPane.showMessageDialog(this,
@@ -290,13 +308,112 @@ public class Principal extends javax.swing.JFrame {
     }//GEN-LAST:event_NombrePedidoActionPerformed
 
     //Limpia el pedido para hacerlo desde 0
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+    private void LimpiarPedidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LimpiarPedidoActionPerformed
         for(int i = 0; i < ListaTextFields.size(); i++){
             ListaTextFields.get(i).setText("");
         }
         Panel.repaint();    //Refresca la interfaz
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
+    }//GEN-LAST:event_LimpiarPedidoActionPerformed
 
+    //Cargar un pedido existente para continuarlo o modificarlo de forma mas sencilla
+    private void CargarPedidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CargarPedidoActionPerformed
+        if(!excelCargado){
+            JOptionPane.showMessageDialog(this,
+            "No hay ningun excel cargado como para cargar un pedido",
+            "Advertencia",
+            JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        JFileChooser Buscador = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());    //Abre el buscador de archivos
+        
+        Buscador.setAcceptAllFileFilterUsed(false);
+        
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Pedido Existente .txt", "txt");  //Permite solo txt (Pedidos generados)
+        Buscador.addChoosableFileFilter(filter);    //Agrega el filtro al buscador
+        
+        File selectedFile = null;   //Inicializa el archivo en null
+        
+        int returnValue = Buscador.showOpenDialog(null);
+        if (returnValue == Buscador.APPROVE_OPTION) {   //Si se selecciona un archivo valido...
+            selectedFile = Buscador.getSelectedFile();  //este se guarda
+        }
+        
+        try {
+            if(selectedFile != null){   //Si el File no es null...
+                String textoPedido = leer(selectedFile);
+                
+                if(textoPedido != ""){
+                    NombrePedido.setText(selectedFile.getName().replace(".txt", ""));
+                    String[] productosYCantidad = textoPedido.split(";");
+                    
+                    for(int i = 0; i < productosYCantidad.length; i++){
+                        String producto = productosYCantidad[i].split(":")[1];
+                        String cantidad = productosYCantidad[i].split(":")[0];
+                        System.out.println(producto);
+                        producto = producto.substring(1, producto.length());
+                        cantidad = cantidad.substring(0,cantidad.length()-1);
+                        
+                        if(ListaProductos.contains(producto)){
+                            ListaTextFields.get(ListaProductos.indexOf(producto)).setText(cantidad);
+                        }
+                    }
+                }
+                        
+            }else{  //Si no se selecciono nada...
+                
+            }
+            
+        } catch (Exception e) {
+            
+        }
+    }//GEN-LAST:event_CargarPedidoActionPerformed
+
+    //Funcion que lee el pedido existente (txt)
+    public static String leer(File archivo){
+        
+        String texto = "";
+        FileReader fr = null;
+        BufferedReader br = null;
+
+        try {
+            // Apertura del fichero y creacion de BufferedReader para poder
+            // hacer una lectura comoda (disponer del metodo readLine()).
+            fr = new FileReader (archivo);
+            br = new BufferedReader(fr);
+            // Lectura del fichero
+            //System.out.println("Leyendo el contendio del archivo.txt");
+            String linea;
+            while((linea=br.readLine())!=null){
+                if(texto == "")
+                    texto += linea;
+                else
+                    texto += ";" + linea;
+                //System.out.println(linea + "\n");
+            }
+        }
+
+        catch(Exception e){
+            e.printStackTrace();
+            return "";
+
+        }finally{
+            // En el finally cerramos el fichero, para asegurarnos
+            // que se cierra tanto si todo va bien como si salta 
+            // una excepcion.
+               
+            try{
+                if( null != fr ){
+                    fr.close();
+                }
+            }catch (Exception e2){
+                e2.printStackTrace();
+                return "";
+            }
+        }
+        return texto;
+    }
+    
     //Funcion para verificar que una cadena es numerica
     public static boolean isNumeric(String str) { 
         try {  
@@ -345,7 +462,9 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JMenuBar BarraMenu;
     private javax.swing.JButton BotonCargar;
     private javax.swing.JButton BotonGenerarPedido;
+    private javax.swing.JMenuItem CargarPedido;
     private javax.swing.JLabel LabelInstruccion;
+    private javax.swing.JMenuItem LimpiarPedido;
     private javax.swing.JMenuItem MenuAcercaDe;
     private javax.swing.JMenuItem MenuAyuda;
     private javax.swing.JMenuItem MenuCargar;
@@ -354,6 +473,5 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JPanel Panel;
     private javax.swing.JScrollPane ScrollPane;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JMenuItem jMenuItem1;
     // End of variables declaration//GEN-END:variables
 }

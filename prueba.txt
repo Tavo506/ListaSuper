@@ -1,0 +1,7 @@
+12 : Cigarros Seneca Duro
+3 : Cigarros Seneca Mentolado
+9 : Cigarros Derby duro cajetilla suave eco pack
+8 : Cigarros Derby suave cajetilla suave eco pack
+7 : Cigarros Malboro  double fusion
+999 : Cigarros Pall mall doble click
+98 : Encendedores bic pequeños
