@@ -39,7 +39,6 @@ public class Principal extends javax.swing.JFrame {
     public Principal() {
         initComponents();
         this.setLocationRelativeTo(null);
-        this.setResizable(false);
         ScrollPane.getVerticalScrollBar().setUnitIncrement(16);
         
     }
@@ -70,10 +69,11 @@ public class Principal extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Generador de Pedidos");
+        setResizable(false);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         LabelInstruccion.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        LabelInstruccion.setText("Para cargar mÃ¡s archivos en Opciones -> Cargar Excel");
+        LabelInstruccion.setText("Para cargar más archivos en Opciones -> Cargar Excel");
         getContentPane().add(LabelInstruccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 300, 330, 30));
 
         BotonCargar.setBackground(new java.awt.Color(0, 153, 0));
