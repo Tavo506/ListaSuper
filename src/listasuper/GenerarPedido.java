@@ -13,8 +13,8 @@ public class GenerarPedido {
             String ruta = nombre + ".txt";
             String contenido =  "SÚPER MARÍA AUXILIADORA\n"+
                                 "Gustavo Blanco Rojas\n"+
-                                "Teléfono: 24631546";
-            contenido = pedido;
+                                "Teléfono: 24631546\n\n";
+            contenido += pedido;
             File file = new File(ruta);
 
             // Si el archivo no existe es creado
