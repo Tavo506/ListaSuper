@@ -6,6 +6,7 @@
 package listasuper;
 
 import java.awt.Color;
+import java.awt.Image;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import static java.util.Locale.filter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -28,17 +30,25 @@ import jxl.read.biff.BiffException;
  */
 public class Principal extends javax.swing.JFrame {
     
-    
+    public static Image menos;
+    public static Image mas;
     private boolean excelCargado = false;
     private ArrayList<JLabel> ListaLabels = new ArrayList<>();  //Lista para los labels de los productos
     private ArrayList<JTextField> ListaTextFields = new ArrayList<>();  //Lista para las entradas
     public static ArrayList<String> ListaProductos = new ArrayList<>(); //Lista con los strings de los productos
+    ArrayList<Producto> Productos = new ArrayList<>();  //Lista de productos
     /**
      * Creates new form Principal
      */
     public Principal() {
         initComponents();
         this.setLocationRelativeTo(null);
+        try {
+            menos = ImageIO.read(getClass().getResource("/Imagenes/menos.png"));
+            mas = ImageIO.read(getClass().getResource("/Imagenes/mas.png"));
+        } catch (IOException ex) {
+            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+        }
         ScrollPane.getVerticalScrollBar().setUnitIncrement(16);
         
     }
@@ -54,11 +64,13 @@ public class Principal extends javax.swing.JFrame {
 
         LabelInstruccion = new javax.swing.JLabel();
         BotonCargar = new javax.swing.JButton();
+        BotonGenerarPedido = new javax.swing.JButton();
         ScrollPane = new javax.swing.JScrollPane();
         Panel = new javax.swing.JPanel();
-        BotonGenerarPedido = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         NombrePedido = new javax.swing.JTextField();
+        textBusqueda = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
         BarraMenu = new javax.swing.JMenuBar();
         MenuOpciones = new javax.swing.JMenu();
         MenuCargar = new javax.swing.JMenuItem();
@@ -73,7 +85,7 @@ public class Principal extends javax.swing.JFrame {
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         LabelInstruccion.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        LabelInstruccion.setText("Para cargar m�s archivos en Opciones -> Cargar Excel");
+        LabelInstruccion.setText("Para cargar más archivos en Opciones -> Cargar Excel");
         getContentPane().add(LabelInstruccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 300, 330, 30));
 
         BotonCargar.setBackground(new java.awt.Color(0, 153, 0));
@@ -86,13 +98,6 @@ public class Principal extends javax.swing.JFrame {
         });
         getContentPane().add(BotonCargar, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 190, 350, 100));
 
-        ScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
-        Panel.setLayout(new java.awt.GridLayout(0, 2, 0, 2));
-        ScrollPane.setViewportView(Panel);
-
-        getContentPane().add(ScrollPane, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 30, 439, 480));
-
         BotonGenerarPedido.setBackground(new java.awt.Color(0, 102, 255));
         BotonGenerarPedido.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
         BotonGenerarPedido.setForeground(new java.awt.Color(255, 255, 255));
@@ -104,6 +109,26 @@ public class Principal extends javax.swing.JFrame {
         });
         getContentPane().add(BotonGenerarPedido, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 516, 439, -1));
 
+        ScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        ScrollPane.setPreferredSize(new java.awt.Dimension(438, 448));
+
+        Panel.setPreferredSize(new java.awt.Dimension(430, 440));
+
+        javax.swing.GroupLayout PanelLayout = new javax.swing.GroupLayout(Panel);
+        Panel.setLayout(PanelLayout);
+        PanelLayout.setHorizontalGroup(
+            PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 435, Short.MAX_VALUE)
+        );
+        PanelLayout.setVerticalGroup(
+            PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 445, Short.MAX_VALUE)
+        );
+
+        ScrollPane.setViewportView(Panel);
+
+        getContentPane().add(ScrollPane, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 70, -1, -1));
+
         jLabel1.setText("Nombre del Pedido Generado :");
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 190, 30));
 
@@ -113,6 +138,24 @@ public class Principal extends javax.swing.JFrame {
             }
         });
         getContentPane().add(NombrePedido, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 0, 230, 30));
+
+        textBusqueda.addInputMethodListener(new java.awt.event.InputMethodListener() {
+            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
+            }
+            public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
+                textBusquedaInputMethodTextChanged(evt);
+            }
+        });
+        textBusqueda.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                textBusquedaActionPerformed(evt);
+            }
+        });
+        getContentPane().add(textBusqueda, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 40, 230, -1));
+
+        jLabel2.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        jLabel2.setText("🔎");
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 40, -1, -1));
 
         MenuOpciones.setText("Opciones");
 
@@ -225,26 +268,35 @@ public class Principal extends javax.swing.JFrame {
         }
         
         //Carga los pruductos en la interfaz
+        int j = 0;
         for(int i = 0; i < ListaProductos.size(); i++){
-            ListaLabels.add(new JLabel(ListaProductos.get(i)));
+            Productos.add(new Producto(ListaProductos.get(i), i*30, Panel));
+            j = i;
+            /*
+            ListaLabels.add(new JLabel(ListaProductos.get(i))); //Crea un label con el nombre
             ListaLabels.get(i).setForeground(Color.black);
             ListaLabels.get(i).setSize(150, 150);
             
-            ListaTextFields.add(new JTextField());
+            ListaTextFields.add(new JTextField());  //Agrega el label al panel
 //            ListaTextFields.get(i).setFocusable(true);
             
             
             Panel.add(ListaLabels.get(i));
             Panel.add(ListaTextFields.get(i));
+            */
+            
         }
-        int rellenar = ListaLabels.size()-14;
-        if(rellenar <= 0){
-            for(int i = Math.abs(rellenar); i >= 0; i--){
-                Panel.add(new JLabel());
-                Panel.add(new JLabel());
-            }
+        if(j+1 >= 17){
+            ScrollPane.setPreferredSize(new java.awt.Dimension(439, 448));
+            Panel.setPreferredSize(new java.awt.Dimension(439, 30*(j+1)+10));
+            ScrollPane.getVerticalScrollBar().setValue(0);
+        }else{
+            ScrollPane.setPreferredSize(new java.awt.Dimension(439, 448));
+            Panel.setPreferredSize(new java.awt.Dimension(439, 440));
         }
+        
         Panel.updateUI();
+        
     }
     
     //Genera el txt con el pedido
@@ -252,17 +304,21 @@ public class Principal extends javax.swing.JFrame {
         if(excelCargado){
         
             String pedido = ""; //Se declara un string que sera la lista que se pondra en el txt
-
-            for(int i = 0; i < ListaTextFields.size(); i++){    //Recorre la lista de productos para ver cuales se van a pedir
-                String producto = ListaTextFields.get(i).getText(); 
-                if(!producto.isEmpty()){ //Verifica que la casilla del producto no este vacia
-                    if(isNumeric(producto) && Integer.parseInt(producto) != 0)  //Verifica que sea un digito y que no sea un 0
-                        pedido += producto + " : "  + ListaProductos.get(i) + "\n";   //Agrega el producto a pedido
-                    else{
-                        ListaTextFields.get(i).requestFocusInWindow();  //Si no es numerico se detiene la ejecucion y se le indica al usuario que puso un dato mal
+            String producto;
+            
+            for(Producto p : Productos){    //Recorre los productos
+                producto = p.getCant();     //Guarda la cantidad de productos
+                
+                if(!producto.trim().isEmpty()){ //Revisa que haya texto
+                    
+                    if(isNumeric(producto) && Integer.parseInt(producto) >= 0){  //Revisa que sea numerico y mayor a 0, sino muestra que valor inválido
+                            if(Integer.parseInt(producto) > 0){ //Revisa que sea mayor a 0
+                                pedido += producto + " : "  + p.getName() + "\n";   //Agrega el producto a pedido
+                            }
+                    }else{
+                        JOptionPane.showMessageDialog(this, "Valor inválido en " + p.getName(), "Alerta", 1);
                         return;
                     }
-
                 }
             }
             
@@ -275,7 +331,7 @@ public class Principal extends javax.swing.JFrame {
             }
             
             String nombre = NombrePedido.getText(); //variable que contiene el nombre para el txt
-            if(nombre.replace(" ","").isEmpty())    //Si el nombre esta en blanco o son solo espacios...
+            if(nombre.trim().isEmpty())    //Si el nombre esta en blanco o son solo espacios...
                 nombre = "Pedido";                  //...pone el nombre "Pedido" por defecto
             GenerarPedido.crear(pedido, nombre);    //Se crea el txt
             
@@ -309,12 +365,16 @@ public class Principal extends javax.swing.JFrame {
 
     //Limpia el pedido para hacerlo desde 0
     private void LimpiarPedidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LimpiarPedidoActionPerformed
-        for(int i = 0; i < ListaTextFields.size(); i++){
-            ListaTextFields.get(i).setText("");
-        }
-        Panel.repaint();    //Refresca la interfaz
+        LimpiarTodo();
     }//GEN-LAST:event_LimpiarPedidoActionPerformed
 
+    private void LimpiarTodo(){
+        for(Producto p : Productos){
+            p.setCant("");
+        }
+        Panel.repaint();    //Refresca la interfaz
+    }
+    
     //Cargar un pedido existente para continuarlo o modificarlo de forma mas sencilla
     private void CargarPedidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CargarPedidoActionPerformed
         if(!excelCargado){
@@ -343,19 +403,18 @@ public class Principal extends javax.swing.JFrame {
             if(selectedFile != null){   //Si el File no es null...
                 String textoPedido = leer(selectedFile);
                 
-                if(textoPedido != ""){
+                if(!"".equals(textoPedido)){
                     NombrePedido.setText(selectedFile.getName().replace(".txt", ""));
                     String[] productosYCantidad = textoPedido.split(";");
-                    
-                    for(int i = 0; i < productosYCantidad.length; i++){
-                        String producto = productosYCantidad[i].split(":")[1];
-                        String cantidad = productosYCantidad[i].split(":")[0];
-                        System.out.println(producto);
+                    LimpiarTodo();
+                    for (String p : productosYCantidad) {
+                        String producto = p.split(":")[1];
+                        String cantidad = p.split(":")[0];
+                        System.out.println(p);
                         producto = producto.substring(1, producto.length());
                         cantidad = cantidad.substring(0,cantidad.length()-1);
-                        
                         if(ListaProductos.contains(producto)){
-                            ListaTextFields.get(ListaProductos.indexOf(producto)).setText(cantidad);
+                            Productos.get(ListaProductos.indexOf(producto)).setCant(cantidad);
                         }
                     }
                 }
@@ -368,6 +427,14 @@ public class Principal extends javax.swing.JFrame {
             
         }
     }//GEN-LAST:event_CargarPedidoActionPerformed
+
+    private void textBusquedaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textBusquedaActionPerformed
+        
+    }//GEN-LAST:event_textBusquedaActionPerformed
+
+    private void textBusquedaInputMethodTextChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_textBusquedaInputMethodTextChanged
+        System.out.println(textBusqueda.getText());
+    }//GEN-LAST:event_textBusquedaInputMethodTextChanged
 
     //Funcion que lee el pedido existente (txt)
     public static String leer(File archivo){
@@ -384,12 +451,17 @@ public class Principal extends javax.swing.JFrame {
             // Lectura del fichero
             //System.out.println("Leyendo el contendio del archivo.txt");
             String linea;
+            int cont = 0;
             while((linea=br.readLine())!=null){
-                if(texto == "")
+                if(cont < 4){
+                    cont++;
+                    continue;
+                }
+                if("".equals(texto))
                     texto += linea;
                 else
                     texto += ";" + linea;
-                //System.out.println(linea + "\n");
+               //System.out.println(linea);
             }
         }
 
@@ -411,13 +483,14 @@ public class Principal extends javax.swing.JFrame {
                 return "";
             }
         }
+        //System.out.println(texto);
         return texto;
     }
     
     //Funcion para verificar que una cadena es numerica
     public static boolean isNumeric(String str) { 
         try {  
-            Double.parseDouble(str);  
+            Integer.parseInt(str);  
             return true;
         } catch(NumberFormatException e){  
             return false;  
@@ -473,5 +546,7 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JPanel Panel;
     private javax.swing.JScrollPane ScrollPane;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JTextField textBusqueda;
     // End of variables declaration//GEN-END:variables
 }
