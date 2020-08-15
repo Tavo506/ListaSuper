@@ -20,6 +20,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 import jxl.read.biff.BiffException;
@@ -33,8 +35,6 @@ public class Principal extends javax.swing.JFrame {
     public static Image menos;
     public static Image mas;
     private boolean excelCargado = false;
-    private ArrayList<JLabel> ListaLabels = new ArrayList<>();  //Lista para los labels de los productos
-    private ArrayList<JTextField> ListaTextFields = new ArrayList<>();  //Lista para las entradas
     public static ArrayList<String> ListaProductos = new ArrayList<>(); //Lista con los strings de los productos
     ArrayList<Producto> Productos = new ArrayList<>();  //Lista de productos
     /**
@@ -52,7 +52,19 @@ public class Principal extends javax.swing.JFrame {
         ScrollPane.getVerticalScrollBar().setUnitIncrement(16);
         
     }
+    
 
+    void busqueda(){
+        if(excelCargado){
+            String busqueda = textBusqueda.getText();
+            for(Producto p : Productos){
+                if(p.LIKE(busqueda)){
+                    System.out.println(p.getName());
+                }
+            }
+        }
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -62,15 +74,15 @@ public class Principal extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        LabelInstruccion = new javax.swing.JLabel();
-        BotonCargar = new javax.swing.JButton();
         BotonGenerarPedido = new javax.swing.JButton();
         ScrollPane = new javax.swing.JScrollPane();
         Panel = new javax.swing.JPanel();
+        BotonCargar = new javax.swing.JButton();
+        LabelInstruccion = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
-        NombrePedido = new javax.swing.JTextField();
-        textBusqueda = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
+        textBusqueda = new javax.swing.JTextField();
+        NombrePedido = new javax.swing.JTextField();
         BarraMenu = new javax.swing.JMenuBar();
         MenuOpciones = new javax.swing.JMenu();
         MenuCargar = new javax.swing.JMenuItem();
@@ -83,20 +95,6 @@ public class Principal extends javax.swing.JFrame {
         setTitle("Generador de Pedidos");
         setResizable(false);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        LabelInstruccion.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        LabelInstruccion.setText("Para cargar más archivos en Opciones -> Cargar Excel");
-        getContentPane().add(LabelInstruccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 300, 330, 30));
-
-        BotonCargar.setBackground(new java.awt.Color(0, 153, 0));
-        BotonCargar.setFont(new java.awt.Font("Dialog", 1, 36)); // NOI18N
-        BotonCargar.setText("Cargar Archivo");
-        BotonCargar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                BotonCargarActionPerformed(evt);
-            }
-        });
-        getContentPane().add(BotonCargar, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 190, 350, 100));
 
         BotonGenerarPedido.setBackground(new java.awt.Color(0, 102, 255));
         BotonGenerarPedido.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
@@ -114,15 +112,39 @@ public class Principal extends javax.swing.JFrame {
 
         Panel.setPreferredSize(new java.awt.Dimension(430, 440));
 
+        BotonCargar.setBackground(new java.awt.Color(0, 153, 0));
+        BotonCargar.setFont(new java.awt.Font("Dialog", 1, 36)); // NOI18N
+        BotonCargar.setText("Cargar Archivo");
+        BotonCargar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BotonCargarActionPerformed(evt);
+            }
+        });
+
+        LabelInstruccion.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        LabelInstruccion.setText("Para cargar más archivos en Opciones -> Cargar Excel");
+
         javax.swing.GroupLayout PanelLayout = new javax.swing.GroupLayout(Panel);
         Panel.setLayout(PanelLayout);
         PanelLayout.setHorizontalGroup(
             PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 435, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelLayout.createSequentialGroup()
+                .addContainerGap(43, Short.MAX_VALUE)
+                .addGroup(PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(BotonCargar, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(PanelLayout.createSequentialGroup()
+                        .addGap(10, 10, 10)
+                        .addComponent(LabelInstruccion, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(42, 42, 42))
         );
         PanelLayout.setVerticalGroup(
             PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 445, Short.MAX_VALUE)
+            .addGroup(PanelLayout.createSequentialGroup()
+                .addGap(140, 140, 140)
+                .addComponent(BotonCargar, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(10, 10, 10)
+                .addComponent(LabelInstruccion, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(165, Short.MAX_VALUE))
         );
 
         ScrollPane.setViewportView(Panel);
@@ -132,30 +154,17 @@ public class Principal extends javax.swing.JFrame {
         jLabel1.setText("Nombre del Pedido Generado :");
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 190, 30));
 
-        NombrePedido.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                NombrePedidoActionPerformed(evt);
-            }
-        });
-        getContentPane().add(NombrePedido, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 0, 230, 30));
+        jLabel2.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        jLabel2.setText("🔎");
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 40, -1, -1));
 
-        textBusqueda.addInputMethodListener(new java.awt.event.InputMethodListener() {
-            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
-            }
-            public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
-                textBusquedaInputMethodTextChanged(evt);
-            }
-        });
         textBusqueda.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 textBusquedaActionPerformed(evt);
             }
         });
         getContentPane().add(textBusqueda, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 40, 230, -1));
-
-        jLabel2.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
-        jLabel2.setText("🔎");
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 40, -1, -1));
+        getContentPane().add(NombrePedido, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 0, 230, 30));
 
         MenuOpciones.setText("Opciones");
 
@@ -241,9 +250,8 @@ public class Principal extends javax.swing.JFrame {
         }
         
         //Limpia las listas de productos ************************
-        ListaProductos.clear();
-        ListaLabels.clear();
-        ListaProductos.clear();
+        ListaProductos = new ArrayList<>();
+        Productos = new ArrayList<>();
         //*******************************************************
         
         Panel.removeAll();  //Limpia la interfaz
@@ -316,7 +324,10 @@ public class Principal extends javax.swing.JFrame {
                                 pedido += producto + " : "  + p.getName() + "\n";   //Agrega el producto a pedido
                             }
                     }else{
+                        ScrollPane.getVerticalScrollBar().setValue(p.getRow()); //Mueve la pantalla donde está el error
+                        p.raiseAlert();     //Marca la casilla en rojo
                         JOptionPane.showMessageDialog(this, "Valor inválido en " + p.getName(), "Alerta", 1);
+                        p.cleanAlert();     //Vuelve la casilla blanca
                         return;
                     }
                 }
@@ -358,10 +369,6 @@ public class Principal extends javax.swing.JFrame {
     private void BotonCargarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonCargarActionPerformed
         cargarExcel();
     }//GEN-LAST:event_BotonCargarActionPerformed
-
-    private void NombrePedidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NombrePedidoActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_NombrePedidoActionPerformed
 
     //Limpia el pedido para hacerlo desde 0
     private void LimpiarPedidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LimpiarPedidoActionPerformed
@@ -429,12 +436,8 @@ public class Principal extends javax.swing.JFrame {
     }//GEN-LAST:event_CargarPedidoActionPerformed
 
     private void textBusquedaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textBusquedaActionPerformed
-        
+        busqueda();
     }//GEN-LAST:event_textBusquedaActionPerformed
-
-    private void textBusquedaInputMethodTextChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_textBusquedaInputMethodTextChanged
-        System.out.println(textBusqueda.getText());
-    }//GEN-LAST:event_textBusquedaInputMethodTextChanged
 
     //Funcion que lee el pedido existente (txt)
     public static String leer(File archivo){

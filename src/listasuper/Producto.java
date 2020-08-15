@@ -97,6 +97,24 @@ public class Producto {
         return labelNombre.getText();
     }
     
+    public int getRow(){
+        return x;
+    }
+    
+    public void raiseAlert(){
+        textCantidad.setBackground(Color.red);
+    }
+    
+    public void cleanAlert(){
+        textCantidad.setBackground(Color.white);
+    }
+    
+    public boolean LIKE(String text){
+        String nombre = labelNombre.getText();
+        return nombre.matches("(.*) "+text+" (.*)");
+    }
+    
+    
     public void setVisible(boolean state){
         labelNombre.setVisible(state);
         textCantidad.setVisible(state);
