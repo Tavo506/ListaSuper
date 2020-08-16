@@ -111,7 +111,7 @@ public class Producto {
     
     public boolean LIKE(String text){
         String nombre = labelNombre.getText();
-        return nombre.matches("(.*) "+text+" (.*)");
+        return nombre.matches("(.*)"+text+"(.*)");
     }
     
     

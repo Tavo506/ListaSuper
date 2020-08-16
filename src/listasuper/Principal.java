@@ -57,11 +57,25 @@ public class Principal extends javax.swing.JFrame {
     void busqueda(){
         if(excelCargado){
             String busqueda = textBusqueda.getText();
+            int row = 0;
             for(Producto p : Productos){
                 if(p.LIKE(busqueda)){
-                    System.out.println(p.getName());
+                    //System.out.println(p.getName());
+                    p.setRow(row*30);
+                    row++;
+                    p.setVisible(true);
+                }else{
+                    p.setVisible(false);
                 }
             }
+            if(row >= 17){
+                ScrollPane.setPreferredSize(new java.awt.Dimension(439, 448));
+                Panel.setPreferredSize(new java.awt.Dimension(439, 30*(row)+10));
+                ScrollPane.getVerticalScrollBar().setValue(0);
+            }else{
+                ScrollPane.setPreferredSize(new java.awt.Dimension(439, 448));
+                Panel.setPreferredSize(new java.awt.Dimension(439, 440));
+        }
         }
     }
     
