@@ -16,7 +16,7 @@ public class Producto {
     JButton decButton, incButton;
     int x;
     
-    public Producto(String nombre, int Nx, JPanel panel){
+    public Producto(String nombre, JPanel panel){
 
         
         labelNombre = new JLabel(nombre);
@@ -56,7 +56,7 @@ public class Producto {
         incButton.setIcon(new ImageIcon(Principal.mas));
 
         
-        setRow(Nx);
+        //setRow(Nx);
         
         panel.add(labelNombre);
         panel.add(decButton);
@@ -110,8 +110,8 @@ public class Producto {
     }
     
     public boolean LIKE(String text){
-        String nombre = labelNombre.getText();
-        return nombre.matches("(.*)"+text+"(.*)");
+        String nombre = labelNombre.getText().toLowerCase();
+        return nombre.matches("(.*)"+text.toLowerCase()+"(.*)");
     }
     
     
